@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fignya
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - dev_network
+
+  app:
+    build:
+      context: ../../project
+      dockerfile: ../deploy/dev/Dockerfile
+    container_name: chikengun
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ../../project:/var/www
+    networks:
+      - dev_network
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:alpine
+    container_name: ne_pridumala
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ../../project:/var/www
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - dev_network
+    depends_on:
+      - app
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tornado
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@govno.com
+      PGADMIN_DEFAULT_PASSWORD: parol_hz
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "8080:80"
+    networks:
+      - dev_network
+    depends_on:
+      - db
+volumes:
+  db_data:
+  pgadmin_data:
+
+networks:
+  dev_network:
+    driver: bridge
