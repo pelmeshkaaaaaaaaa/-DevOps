@@ -28,7 +28,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: ne_pridumala
+    container_name: proxy
     restart: unless-stopped
     ports:
       - "8000:80"
