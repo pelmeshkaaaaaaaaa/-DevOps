@@ -1,4 +1,4 @@
-FROM php:8.4-fpm-alpine
+FROM php:8.4.26-fpm-alpine
 RUN apk add --no-cache \
     bash \
     curl \
@@ -16,4 +16,5 @@ COPY . .
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 EXPOSE 9000
+USER www-data
 CMD ["php-fpm"]
